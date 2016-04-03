@@ -1,33 +1,33 @@
-- name: add_group '{{ tomcat_user }}'
+- name: 添加用户组 '{{ tomcat_user }}'
   group: name={{tomcat_group}}
 
-- name: add_user '{{ tomcat_user }}'
+- name: 添加用户 '{{ tomcat_user }}'
   user: name={{tomcat_user}} group={{tomcat_group}}
 
-- name: create tomcat directory ' {{ deploy_path }} '
+- name: 创建tomcat应用目录 ' {{ deploy_path }} '
   file: path={{deploy_path}} state=directory owner={{tomcat_user}} group={{tomcat_group}}
 
-- name: Download Tomcat
+- name: 下载 Tomcat
   get_url: url={{tomcat_mirrors}}/tomcat/{{tomcat_major_version}}/v{{tomcat_version}}/bin/apache-tomcat-{{tomcat_version}}.tar.gz  dest={{deploy_path}}/apache-tomcat-{{tomcat_version}}.tar.gz
 
 - stat: path={{deploy_path}}/tomcat-{{app}}-{{http_port}}
   register: tomcat_path_register
 
-- name: Extract archive
+- name: 解压下载包到tomcat目录
   command: chdir=/usr/share /bin/tar zxvf {{deploy_path}}/apache-tomcat-{{tomcat_version}}.tar.gz -C {{deploy_path}} creates={{deploy_path}}/apache-tomcat-{{tomcat_version}}
   when: tomcat_path_register.stat.exists == False
 
-- name: change tomcat directory name
+- name: 更改tomcat 目录名为 tomcat- app名- 端口号
   command: chdir=/usr/share /bin/mv {{deploy_path}}/apache-tomcat-{{tomcat_version}} {{deploy_path}}/tomcat-{{app}}-{{http_port}} creates={{deploy_path}}/tomcat-{{app}}-{{http_port}}
 
-- name: Change ownership of Tomcat installation
+- name: 修改tomcat目录的属主为 新建的user
   file: path={{deploy_path}}/tomcat-{{app}}-{{http_port}} owner={{tomcat_user}} group={{tomcat_group}} state=directory recurse=yes
 
-- name: Configure Tomcat server
+- name: 配置server.xml
   template: src=server.xml dest={{deploy_path}}/tomcat-{{app}}-{{http_port}}/conf/ owner={{tomcat_user}} group={{tomcat_group}}
   #notify: restart tomcat
 
-- name: Configure Tomcat setenv.sh
+- name: 配置 Tomcat 环境变量 setenv.sh
   template: src=setenv.sh dest={{deploy_path}}/tomcat-{{app}}-{{http_port}}/bin/ owner={{tomcat_user}} group={{tomcat_group}} mode=0755
 #  notify: restart tomcat
 
