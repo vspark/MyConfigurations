@@ -1,0 +1,9 @@
+---
+# test yaml
+
+- hosts: all
+  user: root
+  vars:
+    - jdk_version: openjdk-7-jdk
+  roles: 
+    - jdk
