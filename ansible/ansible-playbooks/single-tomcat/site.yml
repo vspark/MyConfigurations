@@ -10,7 +10,7 @@
     tomcat_version: 7.0.68
     tomcat_group: tom
     tomcat_user: tom
-    deploy_path: /home/tom/
+    deploy_path: /home/tom/server
     app: test
     server_port: 9080
     http_port: 8080

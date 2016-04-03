@@ -10,29 +10,30 @@
 - name: Download Tomcat
   get_url: url={{tomcat_mirrors}}/tomcat/{{tomcat_major_version}}/v{{tomcat_version}}/bin/apache-tomcat-{{tomcat_version}}.tar.gz  dest={{deploy_path}}/apache-tomcat-{{tomcat_version}}.tar.gz
 
-- stat: path={{deploy_path}}/tomcat-{{app}}
+- stat: path={{deploy_path}}/tomcat-{{app}}-{{http_port}}
   register: tomcat_path_register
 
 - name: Extract archive
-  command: chdir=/usr/share /bin/tar xvf {{deploy_path}}/apache-tomcat-{{tomcat_version}}.tar.gz -C {{deploy_path}} creates={{deploy_path}}/apache-tomcat-{{tomcat_version}}
+  command: chdir=/usr/share /bin/tar zxvf {{deploy_path}}/apache-tomcat-{{tomcat_version}}.tar.gz -C {{deploy_path}} creates={{deploy_path}}/apache-tomcat-{{tomcat_version}}
   when: tomcat_path_register.stat.exists == False
 
 - name: change tomcat directory name
-  command: chdir=/usr/share /bin/mv {{deploy_path}}/apache-tomcat-{{tomcat_version}} {{deploy_path}}/tomcat-{{app}} creates={{deploy_path}}/tomcat-{{app}}
+  command: chdir=/usr/share /bin/mv {{deploy_path}}/apache-tomcat-{{tomcat_version}} {{deploy_path}}/tomcat-{{app}}-{{http_port}} creates={{deploy_path}}/tomcat-{{app}}-{{http_port}}
 
 - name: Change ownership of Tomcat installation
-  file: path={{deploy_path}}/tomcat-{{app}} owner={{tomcat_user}} group={{tomcat_group}} state=directory recurse=yes
+  file: path={{deploy_path}}/tomcat-{{app}}-{{http_port}} owner={{tomcat_user}} group={{tomcat_group}} state=directory recurse=yes
 
 - name: Configure Tomcat server
-  template: src=server.xml dest={{deploy_path}}/tomcat-{{app}}/conf/
-#  notify: restart tomcat
+  template: src=server.xml dest={{deploy_path}}/tomcat-{{app}}-{{http_port}}/conf/ owner={{tomcat_user}} group={{tomcat_group}}
+  #notify: restart tomcat
 
 - name: Configure Tomcat setenv.sh
-  template: src=setenv.sh dest={{deploy_path}}/tomcat-{{app}}/bin/
+  template: src=setenv.sh dest={{deploy_path}}/tomcat-{{app}}-{{http_port}}/bin/ owner={{tomcat_user}} group={{tomcat_group}} mode=0755
 #  notify: restart tomcat
 
-- name: Configure  tomcat-control.sh
-  template: src=tomcat-control.sh dest={{deploy_path}}/tomcat-{{app}}/bin/
+#- name: Configure  tomcat-control.sh
+#  template: src=tomcat-control.sh dest={{deploy_path}}/tomcat-{{app}}-{{http_port}}/bin/ owner={{tomcat_user}} group={{tomcat_group}} mode=0755
+
 
 #- name: add supervisor config
-#  template: src=tomcat-supervisor.ini dest={{ supervisor_conf_root }}/conf.d/tomcat-{{app}}.ini
+#  template: src=tomcat-supervisor.ini dest={{ supervisor_conf_root }}/conf.d/tomcat-{{app}}-{{http_port}}.ini

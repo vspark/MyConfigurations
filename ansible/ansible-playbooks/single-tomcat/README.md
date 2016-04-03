@@ -5,6 +5,7 @@
 #### 1. 环境说明
 
     环境说明:
+    ansible版本:2.1.0
     os=ubuntu14.04 LTS
     tomcat 7 + jdk 1.7 
     端口号:8080
