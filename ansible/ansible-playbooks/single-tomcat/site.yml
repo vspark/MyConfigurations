@@ -1,9 +1,22 @@
 ---
-# test yaml
+# site.yml for install openjdk7  and tomcat 7
 
 - hosts: all
   user: root
   vars:
-    - jdk_version: openjdk-7-jdk
-  roles: 
+    jdk_version: openjdk-7-jdk
+    tomcat_mirrors: http://mirrors.hust.edu.cn/apache
+    tomcat_major_version: tomcat-7
+    tomcat_version: 7.0.68
+    tomcat_group: tom
+    tomcat_user: tom
+    deploy_path: /home/tom/
+    app: test
+    server_port: 9080
+    http_port: 8080
+    https_port: 7080
+    JAVA_OPTS: '-Dspring.profiles.active=product'
+    JAVA_HOME: /usr/lib/jvm/java-7-openjdk-amd64
+  roles:
     - jdk
+    - tomcat
